@@ -41,21 +41,6 @@ data "aws_ami" "ami" {
 }
 
 
-resource "aws_instance" "web" {
-  ami                    = data.aws_ami.ami.image_id
-  instance_type          = "t2.xlarge"
-  key_name               = "roopak -mumbai"
-  vpc_security_group_ids = [aws_security_group.web-sg.id]
-  user_data              = templatefile("./tools-install.sh", {})
-
-
-  tags = {
-    Name = "Jenkins-Server"
-  }
-
-}
-
-
 resource "aws_iam_role" "iam-role" {
   name               = "Jenkins-role"
   assume_role_policy = <<-EOF
@@ -79,4 +64,27 @@ resource "aws_iam_role_policy_attachment" "iam-policy" {
   role = aws_iam_role.iam-role.name
   # Just for testing purpose, don't try to give administrator access
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+
+resource "aws_iam_instance_profile" "instance-profile" {
+  name = "Jenkins-instance-profile"
+  role = aws_iam_role.iam-role.name
+}
+
+
+
+resource "aws_instance" "web" {
+  ami                    = data.aws_ami.ami.image_id
+  instance_type          = "t2.xlarge"
+  key_name               = "roopak -mumbai"
+  vpc_security_group_ids = [aws_security_group.web-sg.id]
+  user_data              = templatefile("./tools-install.sh", {})
+  iam_instance_profile = aws_iam_instance_profile.instance-profile.name 
+
+
+  tags = {
+    Name = "Jenkins-Server"
+  }
+
 }
