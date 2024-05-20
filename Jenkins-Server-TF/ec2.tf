@@ -68,7 +68,7 @@ resource "aws_iam_role_policy_attachment" "iam-policy" {
 
 
 resource "aws_iam_instance_profile" "instance-profile" {
-  name = "Jenkins-instance-profile"
+  name = "Jenkins-Server-instance-profile"
   role = aws_iam_role.iam-role.name
 }
 
@@ -80,7 +80,7 @@ resource "aws_instance" "web" {
   key_name               = "roopak -mumbai"
   vpc_security_group_ids = [aws_security_group.web-sg.id]
   user_data              = templatefile("./tools-install.sh", {})
-  iam_instance_profile = aws_iam_instance_profile.instance-profile.name 
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile.name
 
 
   tags = {
